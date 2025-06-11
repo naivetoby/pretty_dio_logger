@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:characters/characters.dart';
 
 const _timeStampKey = '_pdl_timeStamp_';
 
@@ -235,7 +236,7 @@ class PrettyDioLogger extends Interceptor {
     final pre = '╟ $key: ';
     final msg = v.toString();
 
-    if (pre.length + msg.length > maxWidth) {
+    if (pre.characters.length + msg.characters.length > maxWidth) {
       logPrint(pre);
       _printBlock(msg);
     } else {
@@ -244,11 +245,11 @@ class PrettyDioLogger extends Interceptor {
   }
 
   void _printBlock(String msg) {
-    final lines = (msg.length / maxWidth).ceil();
+    final lines = (msg.characters.length / maxWidth).ceil();
     for (var i = 0; i < lines; ++i) {
       logPrint((i >= 0 ? '║ ' : '') +
-          msg.substring(i * maxWidth,
-              math.min<int>(i * maxWidth + maxWidth, msg.length)));
+          msg.characters.getRange(i * maxWidth,
+              math.min<int>(i * maxWidth + maxWidth, msg.characters.length)).toString());
     }
   }
 
@@ -293,12 +294,12 @@ class PrettyDioLogger extends Interceptor {
         final msg = value.toString().replaceAll('\n', '');
         final indent = _indent(tabs);
         final linWidth = maxWidth - indent.length;
-        if (msg.length + indent.length > linWidth) {
-          final lines = (msg.length / linWidth).ceil();
+        if (msg.characters.length + indent.length > linWidth) {
+          final lines = (msg.characters.length / linWidth).ceil();
           for (var i = 0; i < lines; ++i) {
             final multilineKey = i == 0 ? "$key:" : "";
             logPrint(
-                '║${_indent(tabs)} $multilineKey ${msg.substring(i * linWidth, math.min<int>(i * linWidth + linWidth, msg.length))}');
+                '║${_indent(tabs)} $multilineKey ${msg.characters.getRange(i * linWidth, math.min<int>(i * linWidth + linWidth, msg.characters.length)).toString()}');
           }
         } else {
           logPrint('║${_indent(tabs)} $key: $msg${!isLast ? ',' : ''}');
@@ -347,11 +348,11 @@ class PrettyDioLogger extends Interceptor {
     return map.values
             .where((dynamic val) => val is Map || val is List)
             .isEmpty &&
-        map.toString().length < maxWidth;
+        map.toString().characters.length < maxWidth;
   }
 
   bool _canFlattenList(List list) {
-    return list.length < 10 && list.toString().length < maxWidth;
+    return list.length < 10 && list.toString().characters.length < maxWidth;
   }
 
   void _printMapAsTable(Map? map, {String? header}) {
