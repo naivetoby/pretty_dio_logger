@@ -310,7 +310,8 @@ class PrettyDioLogger extends Interceptor {
         final indent = _indent(tabs);
         final linWidth = maxWidth - _calculateDisplayWidth(indent);
 
-        if (_calculateDisplayWidth(msg) + _calculateDisplayWidth(indent) > linWidth) {
+        if (_calculateDisplayWidth(msg) + _calculateDisplayWidth(indent) >
+            linWidth) {
           var currentLine = '';
           var currentWidth = 0.0;
 
@@ -396,8 +397,14 @@ class PrettyDioLogger extends Interceptor {
   double _calculateDisplayWidth(String text) {
     double width = 0;
     for (final char in text.characters) {
-      // Check if the character is full-width (including Chinese, Japanese, etc.)
-      if (RegExp(r'[\u4e00-\u9fa5]|[\uFF00-\uFFFF]').hasMatch(char)) {
+      // Check for:
+      // 1. CJK Symbols and Punctuation (U+3000-U+303F)
+      // 2. CJK Unified Ideographs (U+4E00-U+9FFF)
+      // 3. Fullwidth ASCII variants (U+FF00-U+FFEF)
+      // 4. CJK Compatibility Forms (U+FE30-U+FE4F)
+      if (RegExp(
+              r'[\u3000-\u303f]|[\u4e00-\u9fff]|[\uff00-\uffef]|[\ufe30-\ufe4f]')
+          .hasMatch(char)) {
         width += 1; // Full-width characters count as 1 unit width
       } else {
         width += 0.5; // Half-width characters count as 0.5 unit width
